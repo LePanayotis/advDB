@@ -32,7 +32,7 @@ data = "hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2023.csv"
 pds = "hdfs://okeanos-master:54310/advancedDB/LAPDs.csv"
 
 spark:SparkSession = SparkSession.builder\
-            .appName("Query4") \
+            .appName("Query4a") \
             .getOrCreate()
 
 start_time = time.time()
@@ -68,23 +68,5 @@ extended_df.groupBy("DIVISION")\
 end_time = time.time()
 elapsed_time = end_time - start_time
 print(f"Elapsed Time 4a: {elapsed_time} seconds")
-start_time = time.time()
-
-### NEAREST DIVISION
-extended_df = df.drop("AREA").join(police_stations, how="full")\
-    .withColumn("distance", haversine_distance_udf(col("LAT1"),col("LON1"),col("LAT2"),col("LON2")))
-
-windowSpec = Window.partitionBy("CRIME_ID").orderBy(col("distance"))
-extended_df = extended_df.withColumn("dist_order", rank().over(windowSpec))\
-    .filter(col("dist_order")==1)\
-    .select("year","distance","division")
-    
-extended_df.groupBy("year").agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total")).show()
-extended_df.groupBy("DIVISION").agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total")).show()
-
-
-end_time = time.time()
-elapsed_time = end_time - start_time
-print(f"Elapsed Time 4b: {elapsed_time} seconds")
 
 spark.stop()

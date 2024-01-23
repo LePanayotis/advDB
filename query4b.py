@@ -52,24 +52,6 @@ police_stations = police_stations.select(col("X").cast("double").alias("LON2"),
                                          col("PREC").cast("integer").alias("AREA"),
                                          col("DIVISION"))
 
-### RESPONSIBLE DIVISION
-extended_df = df.join(police_stations, on=["AREA"], how="inner")\
-    .withColumn("distance", haversine_distance_udf(col("LAT1"),col("LON1"),col("LAT2"),col("LON2")))
-
-extended_df.groupBy("year")\
-    .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
-    .show()
-
-extended_df.groupBy("DIVISION")\
-    .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
-    .show()
-
-
-end_time = time.time()
-elapsed_time = end_time - start_time
-print(f"Elapsed Time 4a: {elapsed_time} seconds")
-start_time = time.time()
-
 ### NEAREST DIVISION
 extended_df = df.drop("AREA").join(police_stations, how="full")\
     .withColumn("distance", haversine_distance_udf(col("LAT1"),col("LON1"),col("LAT2"),col("LON2")))
