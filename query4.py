@@ -28,11 +28,9 @@ def haversine_distance(lat1, lon1, lat2, lon2):
 
 haversine_distance_udf = udf(haversine_distance,FloatType())
 
-# Specify the HDFS path to your CSV file
 data = "hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2023.csv"
 pds = "hdfs://okeanos-master:54310/advancedDB/LAPDs.csv"
 
-# Initialize a Spark session
 spark:SparkSession = SparkSession.builder\
             .appName("Query4") \
             .getOrCreate()
@@ -55,17 +53,22 @@ police_stations = police_stations.select(col("X").cast("double").alias("LON2"),
                                          col("DIVISION"))
 
 ### RESPONSIBLE DIVISION
-extended_df = df.join(police_stations, on=["AREA"], how="inner")
+extended_df = df.join(police_stations, on=["AREA"], how="inner")\
+    .withColumn("distance", haversine_distance_udf(col("LAT1"),col("LON1"),col("LAT2"),col("LON2")))
 
-extended_df = extended_df.withColumn("distance", haversine_distance_udf(col("LAT1"),col("LON1"),col("LAT2"),col("LON2")))
+extended_df.groupBy("year")\
+    .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
+    .show()
 
-extended_df.groupBy("year").agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total")).show()
+extended_df.groupBy("DIVISION")\
+    .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
+    .show()
 
-extended_df.groupBy("DIVISION").agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total")).show()
-# Calculate and print elapsed time
+
 end_time = time.time()
 elapsed_time = end_time - start_time
-print(f"Elapsed Time: {elapsed_time} seconds")
+print(f"Elapsed Time 1: {elapsed_time} seconds")
+start_time = time.time()
 
 ### NEAREST DIVISION
 extended_df = df.drop("AREA").join(police_stations, how="full")\
@@ -79,10 +82,9 @@ extended_df = extended_df.withColumn("dist_order", rank().over(windowSpec))\
 extended_df.groupBy("year").agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total")).show()
 extended_df.groupBy("DIVISION").agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total")).show()
 
-# Calculate and print elapsed time
+
 end_time = time.time()
 elapsed_time = end_time - start_time
-print(f"Elapsed Time: {elapsed_time} seconds")
-
+print(f"Elapsed Time 2: {elapsed_time} seconds")
 
 spark.stop()

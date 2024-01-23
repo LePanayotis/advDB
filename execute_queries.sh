@@ -1,0 +1,1 @@
+spark-submit --conf spark.logConf=true --conf spark.log.level=WARN your_spark_application.py

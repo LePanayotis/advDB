@@ -4,11 +4,12 @@ from pyspark.sql.window import Window
 from pyspark.sql.functions import udf
 from pyspark.sql.types import IntegerType
 import time
-# Initialize a Spark session
+
 spark = SparkSession.builder \
     .appName("Query3") \
     .getOrCreate()
 start_time = time.time()
+
 def income_to_int(income):
     return int(income.replace("$", "").replace(",", ""))
 
@@ -17,7 +18,8 @@ income_to_int_udf = udf(income_to_int, IntegerType())
 main_dataset = "hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2023.csv"
 wealth_by_zip = "hdfs://okeanos-master:54310/advancedDB/income/LA_income_2015.csv"
 geocoding = "hdfs://okeanos-master:54310/advancedDB/geocoding.csv"
-# Read the CSV file into a DataFrame
+
+
 gc = spark.read.csv(geocoding, header=True, inferSchema=False)
 df = spark.read.csv(main_dataset, header=True, inferSchema=False)
 income_df = spark.read.csv(wealth_by_zip, header=True, inferSchema=False)
@@ -38,7 +40,6 @@ income_df = income_df.withColumn("Median Income",income_to_int_udf(col("Estimate
     .select(col("Zip Code").cast("string"),
             col("Median Income").cast("integer"))
 
-
 windowSpec = Window.orderBy(col("Median Income"))
 income_incr = income_df.orderBy(col("Median Income"))\
     .withColumn("order", rank().over(windowSpec))\
@@ -57,11 +58,9 @@ df = df.join(gc, on=["LAT","LON"], how="inner")\
     .select("Vict Descent")\
     .groupBy(col("Vict Descent"))\
     .agg(count("*").alias("crime_total"))\
-    .orderBy(col("crime_total").desc())
+    .orderBy(col("crime_total").desc())\
+    .show()
 
-df.show()
-
-# Calculate and print elapsed time
 end_time = time.time()
 elapsed_time = end_time - start_time
 print(f"Elapsed Time: {elapsed_time} seconds")
