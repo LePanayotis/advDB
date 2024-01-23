@@ -1,0 +1,8 @@
+('Night', 196626, 1)
+('Evening', 166063, 2)
+('Afternoon', 126581, 3)
+('Morning', 108018, 4)
+(None, 9504, 5)
+
+RDD received initially 2993434 entries
+RDD filtered to 606792 entries

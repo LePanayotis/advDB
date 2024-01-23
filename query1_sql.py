@@ -1,20 +1,18 @@
 from pyspark.sql import SparkSession
+import time
+
+# Specify the HDFS path to your CSV file
+data = "hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2023.csv"
+
 
 # Initialize a Spark session
 spark = SparkSession.builder \
-    .appName("Query0") \
+    .appName("Query1_SQL") \
     .getOrCreate()
-
-# Specify the HDFS path to your CSV file
-data_2010_2019 = "hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2019.csv"
-data_2020_present = "hdfs://okeanos-master:54310/advancedDB/la-crime.2020-present.csv"
+start_time = time.time()
 
 # Read the CSV file into a DataFrame
-
-df1 = spark.read.csv(data_2010_2019, header=True, inferSchema=True)
-df2 = spark.read.csv(data_2020_present, header=True, inferSchema=True)
-
-df = df1.union(df2)
+df = spark.read.csv(data, header=True, inferSchema=True)
 
 df.createOrReplaceTempView("crime_data")
 
@@ -44,9 +42,9 @@ WHERE order_within_year <= 3
     """
 ).show(n=df.count(), truncate=False)
 
-
-
-output_path = "hdfs://okeanos-master:54310/advancedDB/query1_sql.csv"
-res.write.csv(output_path, header=True, mode="overwrite")
+# Calculate and print elapsed time
+end_time = time.time()
+elapsed_time = end_time - start_time
+print(f"Elapsed Time: {elapsed_time} seconds")
 
 spark.stop()

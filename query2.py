@@ -1,48 +1,53 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, to_timestamp, rank, count, row_number
+from pyspark.sql.functions import col, rank, count
 from pyspark.sql.window import Window
 from pyspark.sql.functions import udf
-from datetime import datetime
 from pyspark.sql.types import StringType
+import time
 # Initialize a Spark session
 spark = SparkSession.builder \
     .appName("Query2") \
     .getOrCreate()
+start_time = time.time()
 
 # Specify the HDFS path to your CSV file
-data_2010_2019 = "hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2019.csv"
-data_2020_present = "hdfs://okeanos-master:54310/advancedDB/la-crime.2020-present.csv"
-df1 = spark.read.csv(data_2010_2019, header=True, inferSchema=True)
-df2 = spark.read.csv(data_2020_present, header=True, inferSchema=True)
-
-df = df1.union(df2).filter(col("Premis Cd")==101).select(to_timestamp(col("DATE OCC"),"MM/dd/yyyy hh:mm:ss a").alias("DATE OCC"))
+data = "hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2023.csv"
 
 # Read the CSV file into a DataFrame
-def categorize_time_of_day(timestamp):
-    hour = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S').hour
+df = spark.read.csv(data, header=True, inferSchema=False)
+
+df = df.filter(col("Premis Cd")=="101").select("TIME OCC")
+
+print(df.count())
+# Read the CSV file into a DataFrame
+def categorize_time_of_day(time):
+    hour = int(time[:2])
     if 5 <= hour < 12:
         return "Morning"
     elif 12 <= hour < 17:
         return "Afternoon"
     elif 17 <= hour < 21:
         return "Evening"
-    elif 21 <= hour | hour < 4:
+    elif 21 <= hour or hour < 5:
         return "Night"
     else:
         return None
 
 categorize_time_of_day_udf = udf(categorize_time_of_day, StringType())
 
-df = df.withColumn("time", categorize_time_of_day_udf(col("DATE OCC"))).select("time").filter(col("time")!=None)
-
-df = df.groupBy("time").agg(count("*").alias("crime_total"))
+df = df.withColumn("time", categorize_time_of_day_udf(col("TIME OCC")))\
+    .groupBy("time")\
+    .agg(count("*").alias("crime_total"))
 
 windowSpec = Window.orderBy(col("crime_total").desc())
 df = df.withColumn("order", rank().over(windowSpec))
 
 df.show(n=df.count(), truncate=False)
 
-output_path = "hdfs://okeanos-master:54310/advancedDB/query2.csv"
-df.write.csv(output_path, header=True, mode="overwrite")
-# Stop the Spark session
+# Calculate and print elapsed time
+end_time = time.time()
+elapsed_time = end_time - start_time
+print(f"Elapsed Time: {elapsed_time} seconds")
+
+
 spark.stop()
