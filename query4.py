@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, to_date, rank, count, year, avg
+from pyspark.sql.functions import col, to_date, rank, count, year, avg, round
 from pyspark.sql.window import Window
 from pyspark.sql.functions import udf
 from pyspark.sql.types import FloatType
@@ -58,11 +58,21 @@ extended_df = df.join(police_stations, on=["AREA"], how="inner")\
 
 extended_df.groupBy("year")\
     .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
-    .show()
+    .select(col("year"),
+            round("dist avg",3).alias("dist avg"),
+            col("crime_total"))\
+    .orderBy(col("year"))\
+    .show(n=extended_df.count(), truncate=False)
+
 
 extended_df.groupBy("DIVISION")\
     .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
-    .show()
+    .select(col("DIVISION"),
+            round("dist avg",3).alias("dist avg"),
+            col("crime_total"))\
+    .orderBy(col("crime_total").desc())\
+    .show(n=extended_df.count(), truncate=False)
+
 
 
 end_time = time.time()
@@ -79,8 +89,23 @@ extended_df = extended_df.withColumn("dist_order", rank().over(windowSpec))\
     .filter(col("dist_order")==1)\
     .select("year","distance","division")
     
-extended_df.groupBy("year").agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total")).show()
-extended_df.groupBy("DIVISION").agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total")).show()
+extended_df.groupBy("year")\
+    .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
+    .select(col("year"),
+            round("dist avg",3).alias("dist avg"),
+            col("crime_total"))\
+    .orderBy(col("year"))\
+    .show(n=extended_df.count(), truncate=False)
+
+
+
+extended_df.groupBy("DIVISION")\
+    .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
+    .select(col("DIVISION"),
+            round("dist avg",3).alias("dist avg"),
+            col("crime_total"))\
+    .orderBy(col("crime_total").desc())\
+    .show(n=extended_df.count(), truncate=False)
 
 
 end_time = time.time()

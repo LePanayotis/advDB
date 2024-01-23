@@ -59,7 +59,8 @@ df = df.join(gc, on=["LAT","LON"], how="inner")\
     .groupBy(col("Vict Descent"))\
     .agg(count("*").alias("crime_total"))\
     .orderBy(col("crime_total").desc())\
-    .show()
+    .show(n=df.count(), truncate=False)
+
 
 end_time = time.time()
 elapsed_time = end_time - start_time

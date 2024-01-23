@@ -29,16 +29,15 @@ start_time = time.time()
 
 df = spark.read.csv(data, header=True, inferSchema=False)
 
-df = df.filter(col("Premis Cd")=="101").select("TIME OCC")
-
-df = df.withColumn("time", categorize_time_of_day_udf(col("TIME OCC")))\
+df = df.filter(col("Premis Cd")=="101")\
+    .select("TIME OCC")\
+    .withColumn("time", categorize_time_of_day_udf(col("TIME OCC")))\
     .groupBy("time")\
     .agg(count("*").alias("crime_total"))
 
 windowSpec = Window.orderBy(col("crime_total").desc())
-df = df.withColumn("order", rank().over(windowSpec))
-
-df.show(n=df.count(), truncate=False)
+df = df.withColumn("order", rank().over(windowSpec))\
+    .show(n=df.count(), truncate=False)
 
 end_time = time.time()
 elapsed_time = end_time - start_time
