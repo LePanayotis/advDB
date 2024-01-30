@@ -27,6 +27,7 @@ df = df.withColumn("year", year("Date Rptd"))\
 
 windowSpec = Window.partitionBy("year").orderBy("year", col("crime_total").desc())
 
+print("Query 1 Result:")
 df = df.withColumn("order", row_number().over(windowSpec))\
     .orderBy("year", col("crime_total").desc())\
     .show(n=df.count(), truncate=False)

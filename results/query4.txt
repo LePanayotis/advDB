@@ -1,0 +1,99 @@
+ubuntu@okeanos-master:~/advancedDB$ spark-submit --conf spark.logConf=true --conf spark.log.level=WARN --num-executors 4 query4.py
+24/01/23 17:51:11 INFO SparkContext: Running Spark version 3.5.0
+24/01/23 17:51:11 INFO SparkContext: OS info Linux, 5.15.0-91-generic, amd64
+24/01/23 17:51:11 INFO SparkContext: Java version 1.8.0_392
+24/01/23 17:51:15 WARN Client: Neither spark.yarn.jars nor spark.yarn.archive is set, falling back to uploading libraries under SPARK_HOME.
+Query 4a Result:
++----+--------+-----------+
+|year|dist avg|crime_total|
++----+--------+-----------+
+|2010|4.316   |8213       |
+|2011|2.793   |7232       |
+|2012|37.402  |6550       |
+|2013|2.826   |5838       |
+|2014|11.101  |4529       |
+|2015|2.706   |6763       |
+|2016|2.718   |8100       |
+|2017|5.956   |7788       |
+|2018|2.733   |7413       |
+|2019|2.74    |7129       |
+|2020|8.615   |8491       |
+|2021|31.211  |12352      |
+|2022|2.609   |10025      |
+|2023|2.548   |8896       |
++----+--------+-----------+
+
++----------------+--------+-----------+
+|DIVISION        |dist avg|crime_total|
++----------------+--------+-----------+
+|77TH STREET     |5.732   |16571      |
+|SOUTHEAST       |13.777  |12929      |
+|NEWTON          |9.857   |9623       |
+|SOUTHWEST       |4.152   |8642       |
+|HOLLENBECK      |14.977  |6119       |
+|HARBOR          |13.33   |5448       |
+|RAMPART         |4.095   |4999       |
+|MISSION         |7.543   |4464       |
+|OLYMPIC         |1.835   |4336       |
+|FOOTHILL        |3.804   |3943       |
+|NORTHEAST       |10.432  |3850       |
+|HOLLYWOOD       |12.045  |3563       |
+|CENTRAL         |4.742   |3486       |
+|WILSHIRE        |13.322  |3431       |
+|NORTH HOLLYWOOD |13.832  |3397       |
+|WEST VALLEY     |17.054  |2792       |
+|VAN NUYS        |2.217   |2649       |
+|PACIFIC         |13.24   |2648       |
+|DEVONSHIRE      |18.515  |2605       |
+|TOPANGA         |3.484   |2313       |
+|WEST LOS ANGELES|12.59   |1511       |
++----------------+--------+-----------+
+
+Elapsed Time 4a: 35.487534523010254 seconds
+Query 4b Result:
++----+--------+-----------+
+|year|dist avg|crime_total|
++----+--------+-----------+
+|2010|3.965   |8213       |
+|2011|2.462   |7232       |
+|2012|37.048  |6550       |
+|2013|2.456   |5838       |
+|2014|10.715  |4529       |
+|2015|2.388   |6763       |
+|2016|2.429   |8100       |
+|2017|5.62    |7788       |
+|2018|2.409   |7413       |
+|2019|2.43    |7129       |
+|2020|8.306   |8491       |
+|2021|30.901  |12352      |
+|2022|2.313   |10025      |
+|2023|2.267   |8896       |
++----+--------+-----------+
+
++----------------+--------+-----------+
+|DIVISION        |dist avg|crime_total|
++----------------+--------+-----------+
+|77TH STREET     |1.722   |13495      |
+|SOUTHEAST       |2.194   |11816      |
+|SOUTHWEST       |2.281   |11215      |
+|NEWTON          |1.57    |7161       |
+|WILSHIRE        |2.443   |6242       |
+|HOLLENBECK      |115.639 |6229       |
+|OLYMPIC         |1.666   |5397       |
+|HOLLYWOOD       |2.008   |5382       |
+|HARBOR          |3.904   |5322       |
+|FOOTHILL        |3.601   |4697       |
+|RAMPART         |1.399   |4689       |
+|VAN NUYS        |2.975   |4671       |
+|CENTRAL         |1.021   |3610       |
+|NORTH HOLLYWOOD |2.747   |3387       |
+|NORTHEAST       |3.752   |3097       |
+|MISSION         |3.812   |2850       |
+|WEST VALLEY     |2.812   |2773       |
+|PACIFIC         |3.7     |2522       |
+|TOPANGA         |3.036   |2417       |
+|DEVONSHIRE      |2.99    |1334       |
+|WEST LOS ANGELES|2.766   |1013       |
++----------------+--------+-----------+
+
+Elapsed Time 4b: 52.43132948875427 seconds

@@ -1,3 +1,10 @@
+ubuntu@okeanos-master:~/advancedDB$ spark-submit --conf spark.logConf=true --conf spark.log.level=WARN --num-executors 4 query1_sql.py
+24/01/23 17:24:14 INFO SparkContext: Running Spark version 3.5.0
+24/01/23 17:24:14 INFO SparkContext: OS info Linux, 5.15.0-91-generic, amd64
+24/01/23 17:24:14 INFO SparkContext: Java version 1.8.0_392
+24/01/23 17:24:17 WARN Client: Neither spark.yarn.jars nor spark.yarn.archive is set, falling back to uploading libraries under SPARK_HOME.
+24/01/23 17:25:14 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.
+Query 1 SQL Result:
 +----+-----+-----------+-----+
 |year|month|crime_total|order|
 +----+-----+-----------+-----+
@@ -45,4 +52,4 @@
 |2023|1    |20276      |3    |
 +----+-----+-----------+-----+
 
-1'16''
+Elapsed Time: 40.08062505722046 seconds

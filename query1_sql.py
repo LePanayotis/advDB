@@ -13,7 +13,7 @@ df = spark.read.csv(data, header=True, inferSchema=True)
 
 df.createOrReplaceTempView("crime_data")
 
-
+print("Query 1 SQL Result:")
 res = spark.sql(
     """
 SELECT

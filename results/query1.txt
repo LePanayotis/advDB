@@ -1,3 +1,9 @@
+ubuntu@okeanos-master:~/advancedDB$ spark-submit --conf spark.logConf=true --conf spark.log.level=WARN --num-executors 4 query1.py
+24/01/23 17:22:23 INFO SparkContext: Running Spark version 3.5.0
+24/01/23 17:22:23 INFO SparkContext: OS info Linux, 5.15.0-91-generic, amd64
+24/01/23 17:22:23 INFO SparkContext: Java version 1.8.0_392
+24/01/23 17:22:28 WARN Client: Neither spark.yarn.jars nor spark.yarn.archive is set, falling back to uploading libraries under SPARK_HOME.
+Query 1 Result:
 +----+-----+-----------+-----+
 |year|month|crime_total|order|
 +----+-----+-----------+-----+
@@ -45,4 +51,4 @@
 |2023|1    |20276      |3    |
 +----+-----+-----------+-----+
 
-1'25''
+Elapsed Time: 49.12280511856079 seconds

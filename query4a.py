@@ -34,8 +34,6 @@ spark:SparkSession = SparkSession.builder\
             .appName("Query4a") \
             .getOrCreate()
 
-start_time = time.time()
-
 df = spark.read.csv(data, header=True, inferSchema=False)
 df = df.select(year(to_date(col("DATE OCC"),"MM/dd/yyyy hh:mm:ss a")).alias("year"),
                            col("AREA ").cast("integer").alias("AREA"),
@@ -51,29 +49,57 @@ police_stations = police_stations.select(col("X").cast("double").alias("LON2"),
                                          col("PREC").cast("integer").alias("AREA"),
                                          col("DIVISION"))
 
+
 ### RESPONSIBLE DIVISION
-extended_df = df.join(police_stations, on=["AREA"], how="inner")\
-    .withColumn("distance", haversine_distance_udf(col("LAT1"),col("LON1"),col("LAT2"),col("LON2")))
+print("--------------------------- \n BROADCAST JOIN \n ---------------------------")
+broadcast_join = df.join(police_stations.hint("BROADCAST"), on=["AREA"], how="inner")
+broadcast_join.explain("formatted")
 
-extended_df.groupBy("year")\
-    .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
-    .select(col("year"),
-            round("dist avg",3).alias("dist avg"),
-            col("crime_total"))\
-    .orderBy(col("year"))\
-    .show(n=extended_df.count(), truncate=False)
+# print("--------------------------- \n MERGE JOIN \n ---------------------------")
+# merge_join = df.join(police_stations.hint("MERGE"), on=["AREA"], how="inner")
+# merge_join.explain("formatted")
 
-extended_df.groupBy("DIVISION")\
-    .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
-    .select(col("DIVISION"),
-            round("dist avg",3).alias("dist avg"),
-            col("crime_total"))\
-    .orderBy(col("crime_total").desc())\
-    .show(n=extended_df.count(), truncate=False)
+# print("--------------------------- \n SHUFFLE_HASH JOIN \n ---------------------------")
+# shuffle_hash = df.join(police_stations.hint("SHUFFLE_HASH"), on=["AREA"], how="inner")
+# shuffle_hash.explain("formatted")
+
+# print("--------------------------- \n SHUFFLE_REPLICATE_NL JOIN \n ---------------------------")
+# shuffle_replicate = df.join(police_stations.hint("SHUFFLE_REPLICATE_NL"), on=["AREA"], how="inner")
+# shuffle_replicate.explain("formatted")
 
 
-end_time = time.time()
-elapsed_time = end_time - start_time
-print(f"Elapsed Time 4a: {elapsed_time} seconds")
+joined_dfs = [broadcast_join]#, merge_join, shuffle_hash, shuffle_replicate]
+
+
+def perform_join(extended_df, start_time):
+    
+
+    print("Query 4a Result:")
+    extended_df.groupBy("year")\
+        .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
+        .select(col("year"),
+                round("dist avg",3).alias("dist avg"),
+                col("crime_total"))\
+        .orderBy(col("year"))\
+        .show(n=extended_df.count())
+
+    extended_df.groupBy("DIVISION")\
+        .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
+        .select(col("DIVISION"),
+                round("dist avg",3).alias("dist avg"),
+                col("crime_total"))\
+        .orderBy(col("crime_total").desc())\
+        .show(n=extended_df.count())
+
+
+    end_time = time.time()
+    elapsed_time = end_time - start_time
+    print(f"Elapsed Time 4a: {elapsed_time} seconds")
+
+df = broadcast_join
+
+start_time = time.time()
+extended_df = df.withColumn("distance", haversine_distance_udf(col("LAT1"),col("LON1"),col("LAT2"),col("LON2")))
+perform_join(extended_df, start_time)
 
 spark.stop()

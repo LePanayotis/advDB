@@ -1,11 +1,22 @@
+ubuntu@okeanos-master:~/advancedDB$ spark-submit --conf spark.logConf=true --conf spark.log.level=WARN --num-executors 4 query2.py
+24/01/23 17:26:51 INFO SparkContext: Running Spark version 3.5.0
+24/01/23 17:26:51 INFO SparkContext: OS info Linux, 5.15.0-91-generic, amd64
+24/01/23 17:26:51 INFO SparkContext: Java version 1.8.0_392
+24/01/23 17:26:54 WARN Client: Neither spark.yarn.jars nor spark.yarn.archive is set, falling back to uploading libraries under SPARK_HOME.
+Query 2 Result:
+24/01/23 17:27:48 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
+24/01/23 17:27:48 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
+24/01/23 17:27:48 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
+24/01/23 17:27:53 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
+24/01/23 17:27:53 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
+24/01/23 17:27:53 WARN WindowExec: No Partition Defined for Window operation! Moving all data to a single partition, this can cause serious performance degradation.
 +---------+-----------+-----+
 |time     |crime_total|order|
 +---------+-----------+-----+
-|Night    |226543     |1    |
+|Night    |237605     |1    |
 |Evening  |187306     |2    |
 |Afternoon|148180     |3    |
 |Morning  |123846     |4    |
-|NULL     |11062      |5    |
 +---------+-----------+-----+
-Initial count 2993433
-696937
+
+Elapsed Time: 31.02690625190735 seconds

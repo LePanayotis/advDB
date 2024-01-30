@@ -35,7 +35,7 @@ spark:SparkSession = SparkSession.builder\
             .appName("Query4") \
             .getOrCreate()
 
-start_time = time.time()
+
 
 df = spark.read.csv(data, header=True, inferSchema=False)
 df = df.select(year(to_date(col("DATE OCC"),"MM/dd/yyyy hh:mm:ss a")).alias("year"),
@@ -51,11 +51,11 @@ police_stations = police_stations.select(col("X").cast("double").alias("LON2"),
                                          col("Y").cast("double").alias("LAT2"),
                                          col("PREC").cast("integer").alias("AREA"),
                                          col("DIVISION"))
-
+start_time = time.time()
 ### RESPONSIBLE DIVISION
 extended_df = df.join(police_stations, on=["AREA"], how="inner")\
     .withColumn("distance", haversine_distance_udf(col("LAT1"),col("LON1"),col("LAT2"),col("LON2")))
-
+print("Query 4a Result:")
 extended_df.groupBy("year")\
     .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
     .select(col("year"),
@@ -85,6 +85,7 @@ extended_df = df.drop("AREA").join(police_stations, how="full")\
     .withColumn("distance", haversine_distance_udf(col("LAT1"),col("LON1"),col("LAT2"),col("LON2")))
 
 windowSpec = Window.partitionBy("CRIME_ID").orderBy(col("distance"))
+print("Query 4b Result:")
 extended_df = extended_df.withColumn("dist_order", rank().over(windowSpec))\
     .filter(col("dist_order")==1)\
     .select("year","distance","division")

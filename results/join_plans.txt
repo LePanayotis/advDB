@@ -1,0 +1,61 @@
+--------------------------- 
+ BROADCAST JOIN 
+ ---------------------------
+== Physical Plan ==
+AdaptiveSparkPlan (10)
++- Project (9)
+   +- BroadcastHashJoin Inner BuildRight (8)
+      :- Project (3)
+      :  +- Filter (2)
+      :     +- Scan csv  (1)
+      +- BroadcastExchange (7)
+         +- Project (6)
+            +- Filter (5)
+               +- Scan csv  (4)
+
+--------------------------- 
+ MERGE JOIN 
+ ---------------------------
+== Physical Plan ==
+AdaptiveSparkPlan (13)
++- Project (12)
+   +- SortMergeJoin Inner (11)
+      :- Sort (5)
+      :  +- Exchange (4)
+      :     +- Project (3)
+      :        +- Filter (2)
+      :           +- Scan csv  (1)
+      +- Sort (10)
+         +- Exchange (9)
+            +- Project (8)
+               +- Filter (7)
+                  +- Scan csv  (6)
+
+--------------------------- 
+ SHUFFLE_HASH JOIN 
+---------------------------
+== Physical Plan ==
+AdaptiveSparkPlan (11)
++- Project (10)
+   +- ShuffledHashJoin Inner BuildRight (9)
+      :- Exchange (4)
+      :  +- Project (3)
+      :     +- Filter (2)
+      :        +- Scan csv  (1)
+      +- Exchange (8)
+         +- Project (7)
+            +- Filter (6)
+               +- Scan csv  (5)
+
+--------------------------- 
+ SHUFFLE_REPLICATE_NL JOIN 
+ ---------------------------
+== Physical Plan ==
+* Project (8)
++- CartesianProduct Inner (7)
+   :- * Project (3)
+   :  +- * Filter (2)
+   :     +- Scan csv  (1)
+   +- * Project (6)
+      +- * Filter (5)
+         +- Scan csv  (4)

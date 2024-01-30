@@ -40,6 +40,7 @@ income_df = income_df.withColumn("Median Income",income_to_int_udf(col("Estimate
     .select(col("Zip Code").cast("string"),
             col("Median Income").cast("integer"))
 
+
 windowSpec = Window.orderBy(col("Median Income"))
 income_incr = income_df.orderBy(col("Median Income"))\
     .withColumn("order", rank().over(windowSpec))\
@@ -53,7 +54,9 @@ income_desc = income_df.orderBy(col("Median Income").desc())\
 income_df = income_incr.union(income_desc).drop(col("order"))
 
 gc = gc.join(income_df, on=["Zip Code"], how="inner")
+gc.explain("formatted")
 
+print("Query 3 Result:")
 df = df.join(gc, on=["LAT","LON"], how="inner")\
     .select("Vict Descent")\
     .groupBy(col("Vict Descent"))\

@@ -1,0 +1,294 @@
+ubuntu@okeanos-master:~/advancedDB$ spark-submit --conf spark.logConf=true --conf spark.log.level=WARN query4a.py
+24/01/30 19:12:45 INFO SparkContext: Running Spark version 3.5.0
+24/01/30 19:12:45 INFO SparkContext: OS info Linux, 5.15.0-92-generic, amd64
+24/01/30 19:12:45 INFO SparkContext: Java version 1.8.0_392
+24/01/30 19:12:51 WARN Client: Neither spark.yarn.jars nor spark.yarn.archive is set, falling back to uploading libraries under SPARK_HOME.
+--------------------------- 
+ BROADCAST JOIN 
+ ---------------------------
+== Physical Plan ==
+AdaptiveSparkPlan (10)
++- Project (9)
+   +- BroadcastHashJoin Inner BuildRight (8)
+      :- Project (3)
+      :  +- Filter (2)
+      :     +- Scan csv  (1)
+      +- BroadcastExchange (7)
+         +- Project (6)
+            +- Filter (5)
+               +- Scan csv  (4)
+
+
+(1) Scan csv 
+Output [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+Batched: false
+Location: InMemoryFileIndex [hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2023.csv]
+PushedFilters: [IsNotNull(Weapon Used Cd)]
+ReadSchema: struct<DR_NO:string,DATE OCC:string,AREA :string,Weapon Used Cd:string,LAT:string,LON:string>
+
+(2) Filter
+Input [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+Condition : (((isnotnull(Weapon Used Cd#33) AND (cast(Weapon Used Cd#33 as int) >= 100)) AND (cast(Weapon Used Cd#33 as int) < 200)) AND isnotnull(cast(AREA #21 as int)))
+
+(3) Project
+Output [6]: [year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Etc/UTC), false) as date)) AS year#73, cast(AREA #21 as int) AS AREA#74, cast(LAT#43 as double) AS LAT1#75, cast(LON#44 as double) AS LON1#76, cast(Weapon Used Cd#33 as int) AS WU#77, DR_NO#17 AS CRIME_ID#78]
+Input [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+
+(4) Scan csv 
+Output [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+Batched: false
+Location: InMemoryFileIndex [hdfs://okeanos-master:54310/advancedDB/LAPDs.csv]
+ReadSchema: struct<X:string,Y:string,DIVISION:string,PREC:string>
+
+(5) Filter
+Input [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+Condition : isnotnull(cast(PREC#108 as int))
+
+(6) Project
+Output [4]: [cast(X#103 as double) AS LON2#115, cast(Y#104 as double) AS LAT2#116, cast(PREC#108 as int) AS AREA#117, DIVISION#106]
+Input [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+
+(7) BroadcastExchange
+Input [4]: [LON2#115, LAT2#116, AREA#117, DIVISION#106]
+Arguments: HashedRelationBroadcastMode(List(cast(input[2, int, true] as bigint)),false), [plan_id=62]
+
+(8) BroadcastHashJoin
+Left keys [1]: [AREA#74]
+Right keys [1]: [AREA#117]
+Join type: Inner
+Join condition: None
+
+(9) Project
+Output [9]: [AREA#74, year#73, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, DIVISION#106]
+Input [10]: [year#73, AREA#74, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, AREA#117, DIVISION#106]
+
+(10) AdaptiveSparkPlan
+Output [9]: [AREA#74, year#73, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, DIVISION#106]
+Arguments: isFinalPlan=false
+
+
+--------------------------- 
+ MERGE JOIN 
+ ---------------------------
+== Physical Plan ==
+AdaptiveSparkPlan (13)
++- Project (12)
+   +- SortMergeJoin Inner (11)
+      :- Sort (5)
+      :  +- Exchange (4)
+      :     +- Project (3)
+      :        +- Filter (2)
+      :           +- Scan csv  (1)
+      +- Sort (10)
+         +- Exchange (9)
+            +- Project (8)
+               +- Filter (7)
+                  +- Scan csv  (6)
+
+
+(1) Scan csv 
+Output [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+Batched: false
+Location: InMemoryFileIndex [hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2023.csv]
+PushedFilters: [IsNotNull(Weapon Used Cd)]
+ReadSchema: struct<DR_NO:string,DATE OCC:string,AREA :string,Weapon Used Cd:string,LAT:string,LON:string>
+
+(2) Filter
+Input [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+Condition : (((isnotnull(Weapon Used Cd#33) AND (cast(Weapon Used Cd#33 as int) >= 100)) AND (cast(Weapon Used Cd#33 as int) < 200)) AND isnotnull(cast(AREA #21 as int)))
+
+(3) Project
+Output [6]: [year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Etc/UTC), false) as date)) AS year#73, cast(AREA #21 as int) AS AREA#74, cast(LAT#43 as double) AS LAT1#75, cast(LON#44 as double) AS LON1#76, cast(Weapon Used Cd#33 as int) AS WU#77, DR_NO#17 AS CRIME_ID#78]
+Input [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+
+(4) Exchange
+Input [6]: [year#73, AREA#74, LAT1#75, LON1#76, WU#77, CRIME_ID#78]
+Arguments: hashpartitioning(AREA#74, 200), ENSURE_REQUIREMENTS, [plan_id=90]
+
+(5) Sort
+Input [6]: [year#73, AREA#74, LAT1#75, LON1#76, WU#77, CRIME_ID#78]
+Arguments: [AREA#74 ASC NULLS FIRST], false, 0
+
+(6) Scan csv 
+Output [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+Batched: false
+Location: InMemoryFileIndex [hdfs://okeanos-master:54310/advancedDB/LAPDs.csv]
+ReadSchema: struct<X:string,Y:string,DIVISION:string,PREC:string>
+
+(7) Filter
+Input [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+Condition : isnotnull(cast(PREC#108 as int))
+
+(8) Project
+Output [4]: [cast(X#103 as double) AS LON2#115, cast(Y#104 as double) AS LAT2#116, cast(PREC#108 as int) AS AREA#117, DIVISION#106]
+Input [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+
+(9) Exchange
+Input [4]: [LON2#115, LAT2#116, AREA#117, DIVISION#106]
+Arguments: hashpartitioning(AREA#117, 200), ENSURE_REQUIREMENTS, [plan_id=91]
+
+(10) Sort
+Input [4]: [LON2#115, LAT2#116, AREA#117, DIVISION#106]
+Arguments: [AREA#117 ASC NULLS FIRST], false, 0
+
+(11) SortMergeJoin
+Left keys [1]: [AREA#74]
+Right keys [1]: [AREA#117]
+Join type: Inner
+Join condition: None
+
+(12) Project
+Output [9]: [AREA#74, year#73, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, DIVISION#106]
+Input [10]: [year#73, AREA#74, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, AREA#117, DIVISION#106]
+
+(13) AdaptiveSparkPlan
+Output [9]: [AREA#74, year#73, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, DIVISION#106]
+Arguments: isFinalPlan=false
+
+
+--------------------------- 
+ SHUFFLE_HASH JOIN 
+ ---------------------------
+== Physical Plan ==
+AdaptiveSparkPlan (11)
++- Project (10)
+   +- ShuffledHashJoin Inner BuildRight (9)
+      :- Exchange (4)
+      :  +- Project (3)
+      :     +- Filter (2)
+      :        +- Scan csv  (1)
+      +- Exchange (8)
+         +- Project (7)
+            +- Filter (6)
+               +- Scan csv  (5)
+
+
+(1) Scan csv 
+Output [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+Batched: false
+Location: InMemoryFileIndex [hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2023.csv]
+PushedFilters: [IsNotNull(Weapon Used Cd)]
+ReadSchema: struct<DR_NO:string,DATE OCC:string,AREA :string,Weapon Used Cd:string,LAT:string,LON:string>
+
+(2) Filter
+Input [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+Condition : (((isnotnull(Weapon Used Cd#33) AND (cast(Weapon Used Cd#33 as int) >= 100)) AND (cast(Weapon Used Cd#33 as int) < 200)) AND isnotnull(cast(AREA #21 as int)))
+
+(3) Project
+Output [6]: [year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Etc/UTC), false) as date)) AS year#73, cast(AREA #21 as int) AS AREA#74, cast(LAT#43 as double) AS LAT1#75, cast(LON#44 as double) AS LON1#76, cast(Weapon Used Cd#33 as int) AS WU#77, DR_NO#17 AS CRIME_ID#78]
+Input [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+
+(4) Exchange
+Input [6]: [year#73, AREA#74, LAT1#75, LON1#76, WU#77, CRIME_ID#78]
+Arguments: hashpartitioning(AREA#74, 200), ENSURE_REQUIREMENTS, [plan_id=121]
+
+(5) Scan csv 
+Output [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+Batched: false
+Location: InMemoryFileIndex [hdfs://okeanos-master:54310/advancedDB/LAPDs.csv]
+ReadSchema: struct<X:string,Y:string,DIVISION:string,PREC:string>
+
+(6) Filter
+Input [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+Condition : isnotnull(cast(PREC#108 as int))
+
+(7) Project
+Output [4]: [cast(X#103 as double) AS LON2#115, cast(Y#104 as double) AS LAT2#116, cast(PREC#108 as int) AS AREA#117, DIVISION#106]
+Input [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+
+(8) Exchange
+Input [4]: [LON2#115, LAT2#116, AREA#117, DIVISION#106]
+Arguments: hashpartitioning(AREA#117, 200), ENSURE_REQUIREMENTS, [plan_id=122]
+
+(9) ShuffledHashJoin
+Left keys [1]: [AREA#74]
+Right keys [1]: [AREA#117]
+Join type: Inner
+Join condition: None
+
+(10) Project
+Output [9]: [AREA#74, year#73, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, DIVISION#106]
+Input [10]: [year#73, AREA#74, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, AREA#117, DIVISION#106]
+
+(11) AdaptiveSparkPlan
+Output [9]: [AREA#74, year#73, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, DIVISION#106]
+Arguments: isFinalPlan=false
+
+
+--------------------------- 
+ SHUFFLE_REPLICATE_NL JOIN 
+ ---------------------------
+== Physical Plan ==
+* Project (8)
++- CartesianProduct Inner (7)
+   :- * Project (3)
+   :  +- * Filter (2)
+   :     +- Scan csv  (1)
+   +- * Project (6)
+      +- * Filter (5)
+         +- Scan csv  (4)
+
+
+(1) Scan csv 
+Output [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+Batched: false
+Location: InMemoryFileIndex [hdfs://okeanos-master:54310/advancedDB/la-crime.2010-2023.csv]
+PushedFilters: [IsNotNull(Weapon Used Cd)]
+ReadSchema: struct<DR_NO:string,DATE OCC:string,AREA :string,Weapon Used Cd:string,LAT:string,LON:string>
+
+(2) Filter [codegen id : 1]
+Input [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+Condition : (((isnotnull(Weapon Used Cd#33) AND (cast(Weapon Used Cd#33 as int) >= 100)) AND (cast(Weapon Used Cd#33 as int) < 200)) AND isnotnull(cast(AREA #21 as int)))
+
+(3) Project [codegen id : 1]
+Output [6]: [year(cast(gettimestamp(DATE OCC#19, MM/dd/yyyy hh:mm:ss a, TimestampType, Some(Etc/UTC), false) as date)) AS year#73, cast(AREA #21 as int) AS AREA#74, cast(LAT#43 as double) AS LAT1#75, cast(LON#44 as double) AS LON1#76, cast(Weapon Used Cd#33 as int) AS WU#77, DR_NO#17 AS CRIME_ID#78]
+Input [6]: [DR_NO#17, DATE OCC#19, AREA #21, Weapon Used Cd#33, LAT#43, LON#44]
+
+(4) Scan csv 
+Output [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+Batched: false
+Location: InMemoryFileIndex [hdfs://okeanos-master:54310/advancedDB/LAPDs.csv]
+ReadSchema: struct<X:string,Y:string,DIVISION:string,PREC:string>
+
+(5) Filter [codegen id : 2]
+Input [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+Condition : isnotnull(cast(PREC#108 as int))
+
+(6) Project [codegen id : 2]
+Output [4]: [cast(X#103 as double) AS LON2#115, cast(Y#104 as double) AS LAT2#116, cast(PREC#108 as int) AS AREA#117, DIVISION#106]
+Input [4]: [X#103, Y#104, DIVISION#106, PREC#108]
+
+(7) CartesianProduct
+Join type: Inner
+Join condition: (AREA#74 = AREA#117)
+
+(8) Project [codegen id : 3]
+Output [9]: [AREA#74, year#73, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, DIVISION#106]
+Input [10]: [year#73, AREA#74, LAT1#75, LON1#76, WU#77, CRIME_ID#78, LON2#115, LAT2#116, AREA#117, DIVISION#106]
+
+
+
+--------------------BROADCAST--------------------
+Elapsed Time 4a: 64.59479475021362 seconds
+
+--------------------MERGE--------------------
+Elapsed Time 4a: 48.82448887825012 seconds
+
+--------------------SHUFFLE_HASH--------------------
+Elapsed Time 4a: 46.66546058654785 seconds
+
+--------------------SHUFFLE_REPLICATE_NL--------------------
+Elapsed Time 4a: 46.03027844429016 seconds
+
+
+--------------------BROADCAST--------------------
+Elapsed Time 4a: 61.87647604942322 seconds
+
+--------------------MERGE--------------------
+Elapsed Time 4a: 80.24103116989136 seconds
+
+--------------------SHUFFLE_HASH-------------------
+Elapsed Time 4a: 78.42789578437805 seconds
+
+--------------------SHUFFLE_REPLICATE_NL--------------------
+Elapsed Time 4a: 151.90782570838928 seconds

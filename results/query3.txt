@@ -1,0 +1,25 @@
++------------+-----------+
+|Vict Descent|crime_total|
++------------+-----------+
+|H           |1053       |
+|W           |610        |
+|B           |349        |
+|O           |272        |
+|X           |71         |
+|A           |46         |
+|K           |4          |
+|C           |1          |
+|I           |1          |
++------------+-----------+
+
+2 executors:
+Elapsed Time: 41.47356176376343 seconds
+Elapsed Time: 42.19261455535889 seconds
+
+3 executors:
+Elapsed Time: 36.991370677948 seconds
+Elapsed Time: 39.51603722572327 seconds
+
+4 executors:
+Elapsed Time: 42.63923501968384 seconds
+Elapsed Time: 40.24541354179382 seconds

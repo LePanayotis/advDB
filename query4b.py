@@ -60,7 +60,8 @@ windowSpec = Window.partitionBy("CRIME_ID").orderBy(col("distance"))
 extended_df = extended_df.withColumn("dist_order", rank().over(windowSpec))\
     .filter(col("dist_order")==1)\
     .select("year","distance","division")
-    
+
+print("Query 4b Result:") 
 extended_df.groupBy("year")\
     .agg(avg("distance").alias("dist avg"),count("distance").alias("crime_total"))\
     .select(col("year"),

@@ -42,7 +42,7 @@ rdd = rdd.sortBy(lambda x: x[1], ascending=False)
 rdd = rdd.zipWithIndex()\
     .map(lambda x: (x[0][0], x[0][1], x[1] + 1))
 
-
+print("Query 2 RDD Result:")
 for row in rdd.collect():
     print(row)
 

@@ -36,6 +36,7 @@ df = df.filter(col("Premis Cd")=="101")\
     .agg(count("*").alias("crime_total"))
 
 windowSpec = Window.orderBy(col("crime_total").desc())
+print("Query 2 Result:")
 df = df.withColumn("order", rank().over(windowSpec))\
     .show(n=df.count(), truncate=False)
 

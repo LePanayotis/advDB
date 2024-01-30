@@ -1,3 +1,8 @@
+ubuntu@okeanos-master:~/advancedDB$ spark-submit --conf spark.logConf=true --conf spark.log.level=WARN query0.py
+24/01/23 17:07:58 INFO SparkContext: Running Spark version 3.5.0
+24/01/23 17:07:58 INFO SparkContext: OS info Linux, 5.15.0-91-generic, amd64
+24/01/23 17:07:58 INFO SparkContext: Java version 1.8.0_392
+24/01/23 17:08:03 WARN Client: Neither spark.yarn.jars nor spark.yarn.archive is set, falling back to uploading libraries under SPARK_HOME.
 +----------+----------+--------+-------+---------+
 | Date Rptd|  DATE OCC|Vict Age|    LAT|      LON|
 +----------+----------+--------+-------+---------+
@@ -24,6 +29,7 @@
 +----------+----------+--------+-------+---------+
 only showing top 20 rows
 
+Number of Rows: 2993433
 Data Types of Each Column:
 root
  |-- Date Rptd: date (nullable = true)
@@ -31,3 +37,5 @@ root
  |-- Vict Age: integer (nullable = true)
  |-- LAT: double (nullable = true)
  |-- LON: double (nullable = true)
+
+Elapsed Time: 29.753455638885498 seconds
